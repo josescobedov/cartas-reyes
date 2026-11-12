@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cartas a los Reyes Magos · Familia</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['"Cinzel Decorative"', 'serif'],
+            serif: ['"Lora"', 'serif'],
+            sans: ['"Inter"', 'sans-serif'],
+          },
+          colors: {
+            night: {
+              950: '#070d1f',
+              900: '#0c1733',
+              800: '#15254d',
+              700: '#1f366e',
+            },
+            gold: {
+              300: '#fde68a',
+              400: '#fbbf24',
+              500: '#d97706',
+              600: '#b45309',
+            },
+            crimson: {
+              600: '#b91c1c',
+              700: '#991b1b',
+              800: '#7f1d1d',
+            },
+            parchment: {
+              50: '#fffdf8',
+              100: '#fdf6e7',
+              200: '#f7e8ca',
+              300: '#edd3a3',
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body {
+      background-color: #070d1f;
+      background-image:
+        radial-gradient(circle at 18% 12%, rgba(251, 191, 36, 0.12) 0%, transparent 38%),
+        radial-gradient(circle at 82% 18%, rgba(185, 28, 28, 0.14) 0%, transparent 42%),
+        linear-gradient(180deg, #070d1f 0%, #0e1c3f 55%, #091128 100%);
+      min-height: 100vh;
+    }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.35; transform: scale(0.95); }
+      50% { opacity: 1; transform: scale(1.12); }
+    }
+    .star-twinkle {
+      animation: twinkle 3.2s ease-in-out infinite;
+      transform-origin: center;
+    }
+    .star-twinkle-delay {
+      animation: twinkle 4.1s ease-in-out 1.4s infinite;
+      transform-origin: center;
+    }
+
+    @keyframes starPulse {
+      0%, 100% { filter: drop-shadow(0 0 10px rgba(253, 224, 71, 0.8)); }
+      50% { filter: drop-shadow(0 0 22px rgba(253, 224, 71, 1)); }
+    }
+    .bethlehem-star {
+      animation: starPulse 3s ease-in-out infinite;
+    }
+
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="text-slate-800 font-sans antialiased selection:bg-amber-200 selection:text-amber-950">
+
+  <!-- Contenedor principal -->
+  <div id="app" class="max-w-4xl mx-auto px-3 sm:px-6 pt-4 pb-28">
+
+    <!-- BANNER DE ESTADO DE SINCRONIZACIÓN (Desaparece o muestra estado conectado al configurar Firebase) -->
+    <div id="syncStatusBanner" class="mb-4 rounded-2xl px-4 py-2.5 text-xs sm:text-sm flex flex-wrap items-center justify-between gap-2 border transition-all bg-amber-950/80 border-amber-400/50 text-amber-100 shadow-lg">
+      <div class="flex items-center gap-2">
+        <span id="syncDot" class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse shrink-0"></span>
+        <span id="syncMessage">Conectando con la nube familiar...</span>
+      </div>
+      <button
+        type="button"
+        id="setupHelpBtn"
+        onclick="toggleSetupModal(true)"
+        class="hidden px-3 py-1 rounded-xl bg-amber-400 hover:bg-amber-300 text-night-950 font-bold text-xs transition-colors cursor-pointer"
+      >
+        Cómo conectar sincronización
+      </button>
+    </div>
+
+    <!-- CABECERA NAVIDEÑA ILUSTRADA (SVG + Nieve en Canvas) -->
+    <header class="relative rounded-3xl overflow-hidden shadow-2xl border-2 border-amber-400/50 bg-night-900 mb-6">
+      <canvas id="snowCanvas" class="absolute inset-0 w-full h-full pointer-events-none z-10"></canvas>
+
+      <div class="relative w-full">
+        <svg viewBox="0 0 1000 330" class="w-full h-auto block" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Ilustración navideña de los Tres Reyes Magos rumbo a Belén bajo una noche estrellada">
+          <defs>
+            <linearGradient id="skyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#050b1c" />
+              <stop offset="55%" stop-color="#0f2354" />
+              <stop offset="100%" stop-color="#1e3f7a" />
+            </linearGradient>
+            <radialGradient id="starGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#fef9c3" stop-opacity="1" />
+              <stop offset="35%" stop-color="#fde047" stop-opacity="0.55" />
+              <stop offset="100%" stop-color="#fde047" stop-opacity="0" />
+            </radialGradient>
+            <linearGradient id="beamGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#fef08a" stop-opacity="0.45" />
+              <stop offset="100%" stop-color="#fef08a" stop-opacity="0" />
+            </linearGradient>
+            <linearGradient id="snowHill1" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#e0f2fe" />
+              <stop offset="100%" stop-color="#bae6fd" />
+            </linearGradient>
+            <linearGradient id="snowHill2" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#ffffff" />
+              <stop offset="100%" stop-color="#e2e8f0" />
+            </linearGradient>
+          </defs>
+
+          <!-- Cielo nocturno -->
+          <rect width="1000" height="330" fill="url(#skyGrad)" />
+
+          <!-- Estrellas -->
+          <g fill="#fef9c3">
+            <circle cx="85" cy="48" r="2.2" class="star-twinkle" />
+            <circle cx="165" cy="82" r="1.8" class="star-twinkle-delay" />
+            <circle cx="240" cy="36" r="2.5" class="star-twinkle" />
+            <circle cx="330" cy="68" r="1.7" class="star-twinkle-delay" />
+            <circle cx="420" cy="30" r="2.4" class="star-twinkle" />
+            <circle cx="515" cy="58" r="2" class="star-twinkle-delay" />
+            <circle cx="610" cy="40" r="2.6" class="star-twinkle" />
+            <circle cx="695" cy="75" r="1.8" class="star-twinkle-delay" />
+            <circle cx="920" cy="52" r="2.4" class="star-twinkle" />
+            <circle cx="960" cy="110" r="1.9" class="star-twinkle-delay" />
+            <circle cx="48" cy="120" r="1.8" class="star-twinkle-delay" />
+            <circle cx="290" cy="115" r="2.1" class="star-twinkle" />
+            <circle cx="565" cy="105" r="1.6" class="star-twinkle" />
+          </g>
+
+          <!-- Haz de luz y Estrella de Belén -->
+          <polygon points="825,62 745,255 905,255" fill="url(#beamGrad)" />
+          <circle cx="825" cy="62" r="58" fill="url(#starGlow)" class="bethlehem-star" />
+          <g transform="translate(825,62)" class="bethlehem-star">
+            <polygon points="0,-34 6,-8 32,0 6,8 0,34 -6,8 -32,0 -6,-8" fill="#fef08a" />
+            <polygon points="0,-20 4,-4 20,0 4,4 0,20 -4,4 -20,0 -4,-4" fill="#ffffff" />
+          </g>
+
+          <!-- Montañas -->
+          <path d="M0,235 Q160,150 340,220 T710,205 T1000,190 L1000,330 L0,330 Z" fill="#173063" opacity="0.85" />
+
+          <!-- Pueblo nevado -->
+          <g transform="translate(725, 175)">
+            <rect x="10" y="34" width="44" height="36" rx="2" fill="#cbd5e1" />
+            <polygon points="6,34 32,14 58,34" fill="#991b1b" />
+            <path d="M6,34 Q32,12 58,34" stroke="#ffffff" stroke-width="4" fill="none" stroke-linecap="round" />
+            <rect x="24" y="45" width="10" height="12" rx="1.5" fill="#fde047" />
+            <rect x="64" y="16" width="34" height="54" rx="2" fill="#e2e8f0" />
+            <polygon points="60,16 81,-6 102,16" fill="#7f1d1d" />
+            <path d="M60,16 Q81,-8 102,16" stroke="#ffffff" stroke-width="4" fill="none" stroke-linecap="round" />
+            <rect x="76" y="28" width="10" height="14" rx="5" fill="#fef08a" />
+            <rect x="106" y="38" width="48" height="32" rx="2" fill="#cbd5e1" />
+            <polygon points="102,38 130,18 158,38" fill="#b45309" />
+            <path d="M102,38 Q130,16 158,38" stroke="#ffffff" stroke-width="4" fill="none" stroke-linecap="round" />
+            <rect x="116" y="47" width="9" height="10" rx="1.5" fill="#fde047" />
+            <rect x="134" y="47" width="9" height="10" rx="1.5" fill="#fde047" />
+          </g>
+
+          <!-- Colinas nevadas -->
+          <path d="M0,248 Q260,210 530,245 T1000,232 L1000,330 L0,330 Z" fill="url(#snowHill1)" />
+          <path d="M0,275 Q320,245 640,272 T1000,262 L1000,330 L0,330 Z" fill="url(#snowHill2)" />
+
+          <!-- Abetos nevados -->
+          <g transform="translate(38, 195)">
+            <polygon points="22,0 0,34 44,34" fill="#065f46" />
+            <polygon points="22,16 -4,54 48,54" fill="#047857" />
+            <polygon points="22,34 -8,76 52,76" fill="#064e3b" />
+            <path d="M10,18 Q22,22 34,18 M5,38 Q22,43 39,38 M1,58 Q22,64 43,58" stroke="#ffffff" stroke-width="3.5" fill="none" stroke-linecap="round" />
+          </g>
+          <g transform="translate(88, 212) scale(0.75)">
+            <polygon points="22,0 0,34 44,34" fill="#065f46" />
+            <polygon points="22,16 -4,54 48,54" fill="#047857" />
+            <polygon points="22,34 -8,76 52,76" fill="#064e3b" />
+            <path d="M10,18 Q22,22 34,18 M5,38 Q22,43 39,38" stroke="#ffffff" stroke-width="3.5" fill="none" stroke-linecap="round" />
+          </g>
+
+          <!-- MELCHOR -->
+          <g transform="translate(165, 168)">
+            <path d="M26,74 L22,106 M38,74 L42,106 M66,74 L63,106 M78,74 L84,106" stroke="#92400e" stroke-width="5.5" stroke-linecap="round" />
+            <path d="M22,68 Q22,46 42,46 Q52,32 62,46 Q78,46 82,64 L96,42 Q102,32 110,36 Q114,40 108,46 L94,72 Q82,80 52,80 Q24,80 22,68 Z" fill="#b45309" />
+            <path d="M32,48 Q52,38 72,48 L70,68 Q52,73 34,68 Z" fill="#b91c1c" stroke="#fbbf24" stroke-width="2" />
+            <path d="M40,46 L44,22 L60,22 L64,46 Z" fill="#047857" />
+            <path d="M42,24 Q30,36 34,50 L48,46 Z" fill="#991b1b" />
+            <circle cx="52" cy="14" r="7.5" fill="#fde68a" />
+            <path d="M45,15 Q52,30 59,15 Z" fill="#ffffff" />
+            <polygon points="45,8 47,2 52,6 57,2 59,8" fill="#fbbf24" />
+            <rect x="61" y="29" width="11" height="8" rx="1.5" fill="#fbbf24" stroke="#78350f" stroke-width="1" />
+          </g>
+
+          <!-- GASPAR -->
+          <g transform="translate(320, 174)">
+            <path d="M26,74 L23,106 M38,74 L41,106 M66,74 L64,106 M78,74 L83,106" stroke="#78350f" stroke-width="5.5" stroke-linecap="round" />
+            <path d="M22,68 Q22,46 42,46 Q52,32 62,46 Q78,46 82,64 L96,42 Q102,32 110,36 Q114,40 108,46 L94,72 Q82,80 52,80 Q24,80 22,68 Z" fill="#a16207" />
+            <path d="M32,48 Q52,38 72,48 L70,68 Q52,73 34,68 Z" fill="#1d4ed8" stroke="#fbbf24" stroke-width="2" />
+            <path d="M40,46 L44,22 L60,22 L64,46 Z" fill="#b91c1c" />
+            <path d="M42,24 Q30,36 34,50 L48,46 Z" fill="#d97706" />
+            <circle cx="52" cy="14" r="7.5" fill="#fcd34d" />
+            <path d="M46,16 Q52,25 58,16 Z" fill="#78350f" />
+            <polygon points="45,8 47,2 52,6 57,2 59,8" fill="#fbbf24" />
+            <rect x="61" y="29" width="11" height="8" rx="1.5" fill="#fef08a" stroke="#78350f" stroke-width="1" />
+          </g>
+
+          <!-- BALTASAR -->
+          <g transform="translate(475, 170)">
+            <path d="M26,74 L22,106 M38,74 L42,106 M66,74 L63,106 M78,74 L84,106" stroke="#92400e" stroke-width="5.5" stroke-linecap="round" />
+            <path d="M22,68 Q22,46 42,46 Q52,32 62,46 Q78,46 82,64 L96,42 Q102,32 110,36 Q114,40 108,46 L94,72 Q82,80 52,80 Q24,80 22,68 Z" fill="#b45309" />
+            <path d="M32,48 Q52,38 72,48 L70,68 Q52,73 34,68 Z" fill="#047857" stroke="#fbbf24" stroke-width="2" />
+            <path d="M40,46 L44,22 L60,22 L64,46 Z" fill="#1e40af" />
+            <path d="M42,24 Q30,36 34,50 L48,46 Z" fill="#991b1b" />
+            <circle cx="52" cy="14" r="7.5" fill="#5c3a21" />
+            <path d="M44,11 Q52,1 60,11 Z" fill="#dc2626" />
+            <circle cx="52" cy="6" r="2.2" fill="#fbbf24" />
+            <rect x="61" y="29" width="11" height="8" rx="1.5" fill="#fbbf24" stroke="#78350f" stroke-width="1" />
+          </g>
+        </svg>
+
+        <!-- Título superpuesto -->
+        <div class="absolute inset-x-0 top-3 sm:top-5 text-center px-4 z-20 pointer-events-none">
+          <span class="inline-block px-3 py-0.5 rounded-full bg-amber-400/20 border border-amber-300/40 text-amber-200 text-[11px] sm:text-xs font-semibold tracking-widest uppercase mb-1 backdrop-blur-xs">
+            ★ Oriente · Noche Mágica de Reyes ★
+          </span>
+          <h1 class="font-display text-xl sm:text-3xl md:text-4xl font-black text-amber-200 drop-shadow-[0_3px_10px_rgba(0,0,0,0.85)] tracking-wide">
+            Cartas a los Reyes Magos
+          </h1>
+        </div>
+      </div>
+    </header>
+
+    <!-- CONTENIDO DINÁMICO -->
+    <main id="mainView"></main>
+
+  </div>
+
+  <!-- BARRA DE NAVEGACIÓN INFERIOR FIJA -->
+  <nav id="bottomNav" class="fixed bottom-0 inset-x-0 z-40 bg-night-950/95 backdrop-blur-md border-t border-amber-400/35 shadow-[0_-8px_25px_rgba(0,0,0,0.6)]">
+    <div class="max-w-4xl mx-auto px-2 py-2 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+      <button
+        type="button"
+        onclick="window.appActions.navigateTo('home')"
+        id="nav-home"
+        class="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold shrink-0 transition-all cursor-pointer"
+      >
+        <span>🏠</span>
+        <span>Menú</span>
+      </button>
+
+      <div class="h-6 w-px bg-amber-400/25 shrink-0 mx-0.5"></div>
+
+      <div id="bottomPeopleButtons" class="flex items-center gap-1.5"></div>
+    </div>
+  </nav>
+
+  <!-- MODAL DE AYUDA PARA CONECTAR LA BASE DE DATOS EN LA NUBE -->
+  <div id="setupModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/75 backdrop-blur-xs p-4">
+    <div class="bg-parchment-50 rounded-3xl max-w-lg w-full p-6 border-2 border-amber-400 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-amber-200 pb-3">
+        <h3 class="font-serif text-xl font-bold text-night-900">☁️ Activar guardado compartido en la nube</h3>
+        <button type="button" onclick="toggleSetupModal(false)" class="text-slate-400 hover:text-slate-700 text-xl font-bold px-2 cursor-pointer">✕</button>
+      </div>
+      <div class="text-sm text-slate-700 space-y-2.5 leading-relaxed">
+        <p>Para que cualquier persona con el enlace de tu <strong>GitHub Pages</strong> pueda añadir o tachar regalos y se guarde para todos sin iniciar sesión:</p>
+        <ol class="list-decimal pl-5 space-y-1.5">
+          <li>Entra en <strong>console.firebase.google.com</strong> (gratis con tu cuenta Google) y crea un proyecto.</li>
+          <li>Activa <strong>Authentication → Sign-in method → Anónimo</strong>.</li>
+          <li>Crea una base de datos <strong>Firestore Database</strong> en modo prueba (o permitiendo lectura/escritura en <code class="bg-amber-100 px-1 rounded">artifacts/cartas-reyes-familia/public/data/cartas</code>).</li>
+          <li>Copia tu <code class="bg-amber-100 px-1 rounded">firebaseConfig</code> en la parte superior del script de este <code class="bg-amber-100 px-1 rounded">index.html</code> y súbelo a GitHub.</li>
+        </ol>
+      </div>
+      <div class="flex justify-end pt-2">
+        <button type="button" onclick="toggleSetupModal(false)" class="px-5 py-2 rounded-xl bg-night-900 text-amber-200 font-semibold text-sm hover:bg-night-800 cursor-pointer">
+          Entendido
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST DE NOTIFICACIÓN -->
+  <div id="toastBanner" class="fixed top-4 right-4 z-50 pointer-events-none opacity-0 translate-y-[-10px] transition-all duration-300">
+    <div id="toastContent" class="px-4 py-3 rounded-2xl shadow-xl border text-sm font-medium flex items-center gap-2.5 bg-night-900 text-amber-100 border-amber-400/60"></div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import {
+      getFirestore,
+      doc,
+      setDoc,
+      onSnapshot,
+      collection
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    // =========================================================================
+    // 1. CONFIGURACIÓN DE LA NUBE PARA GITHUB PAGES
+    // =========================================================================
+    // Pega aquí los datos de tu proyecto web de Firebase para que los cambios
+    // se sincronicen en tiempo real entre todos los móviles y ordenadores:
+    const USER_FIREBASE_CONFIG = {
+      apiKey: "AIzaSyDKMwSdU6fZDKPGlSK0V-b7Igw1vjkPv_A",
+      authDomain: "cartareyes.firebaseapp.com",
+      projectId: "cartareyes",
+      storageBucket: "cartareyes.firebasestorage.app",
+      messagingSenderId: "321604153196",
+      appId: "1:321604153196:web:76cf2a5c587b11b35f0d49",
+      measurementId: "G-V6EH3QLJHR"
+    };
+
+    // Detectar configuración proporcionada por el entorno o por el usuario
+    const rawEnvConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+    const isUserConfigValid = USER_FIREBASE_CONFIG.apiKey && USER_FIREBASE_CONFIG.apiKey !== "TU_API_KEY_AQUI";
+    const activeFirebaseConfig = rawEnvConfig || (isUserConfigValid ? USER_FIREBASE_CONFIG : null);
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'cartas-reyes-familia';
+
+    // =========================================================================
+    // 2. MIEMBROS DE LA FAMILIA Y ESTADO EN MEMORIA
+    // =========================================================================
+    const FAMILY_MEMBERS = [
+      { id: 'rodrigo', name: 'Rodrigo', emoji: '👑', accent: 'from-amber-500 to-red-700' },
+      { id: 'leo', name: 'Leo', emoji: '⭐', accent: 'from-blue-600 to-indigo-900' },
+      { id: 'maria', name: 'María', emoji: '✨', accent: 'from-rose-500 to-red-800' },
+      { id: 'norma', name: 'Norma', emoji: '🎄', accent: 'from-emerald-600 to-teal-900' },
+      { id: 'jose', name: 'José', emoji: '🐪', accent: 'from-amber-600 to-orange-900' },
+      { id: 'santiago', name: 'Santiago', emoji: '🎁', accent: 'from-purple-600 to-indigo-950' }
+    ];
+
+    const appData = {};
+    FAMILY_MEMBERS.forEach(m => {
+      appData[m.id] = { message: '', wishes: [] };
+    });
+
+    let currentRoute = 'home';
+    let db = null;
+    let currentUser = null;
+    let isCloudConnected = false;
+    let messageDebounceTimer = null;
+
+    // =========================================================================
+    // 3. INICIALIZACIÓN DE SINCRONIZACIÓN EN TIEMPO REAL
+    // =========================================================================
+    function updateSyncBanner(mode, text) {
+      const banner = document.getElementById('syncStatusBanner');
+      const dot = document.getElementById('syncDot');
+      const msg = document.getElementById('syncMessage');
+      const helpBtn = document.getElementById('setupHelpBtn');
+
+      msg.textContent = text;
+      if (mode === 'connected') {
+        banner.className = 'mb-4 rounded-2xl px-4 py-2 text-xs sm:text-sm flex flex-wrap items-center justify-between gap-2 border bg-emerald-950/80 border-emerald-400/50 text-emerald-100 shadow-md';
+        dot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-400 shrink-0';
+        helpBtn.classList.add('hidden');
+      } else if (mode === 'demo') {
+        banner.className = 'mb-4 rounded-2xl px-4 py-2.5 text-xs sm:text-sm flex flex-wrap items-center justify-between gap-2 border bg-amber-950/85 border-amber-400/60 text-amber-100 shadow-md';
+        dot.className = 'w-2.5 h-2.5 rounded-full bg-amber-400 shrink-0';
+        helpBtn.classList.remove('hidden');
+      } else {
+        banner.className = 'mb-4 rounded-2xl px-4 py-2 text-xs sm:text-sm flex flex-wrap items-center justify-between gap-2 border bg-night-900/90 border-amber-400/40 text-amber-100';
+        dot.className = 'w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse shrink-0';
+        helpBtn.classList.add('hidden');
+      }
+    }
+
+    async function initCloudSync() {
+      if (!activeFirebaseConfig) {
+        updateSyncBanner('demo', 'Modo vista previa: añade tu configuración en index.html para guardar en la nube entre dispositivos.');
+        return;
+      }
+
+      try {
+        const app = initializeApp(activeFirebaseConfig);
+        const auth = getAuth(app);
+        db = getFirestore(app);
+
+        // Autenticación automática sin pedir cuenta ni contraseña al usuario
+        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+          const cred = await signInWithCustomToken(auth, __initial_auth_token);
+          currentUser = cred.user;
+        } else {
+          const cred = await signInAnonymously(auth);
+          currentUser = cred.user;
+        }
+
+        if (!currentUser) return;
+
+        // Suscripción en tiempo real a la colección pública de cartas de la familia
+        const cartasColRef = collection(db, 'artifacts', appId, 'public', 'data', 'cartas_reyes_familia');
+
+        onSnapshot(
+          cartasColRef,
+          (snapshot) => {
+            isCloudConnected = true;
+            updateSyncBanner('connected', 'Conectado · Todos los cambios se guardan y sincronizan en tiempo real para la familia.');
+
+            snapshot.forEach((docSnap) => {
+              const memberId = docSnap.id;
+              if (appData[memberId]) {
+                const data = docSnap.data();
+                appData[memberId].message = typeof data.message === 'string' ? data.message : '';
+                appData[memberId].wishes = Array.isArray(data.wishes) ? data.wishes : [];
+              }
+            });
+
+            renderBottomNav();
+            // Evitar sobrescribir el textarea mientras el usuario está escribiendo activamente
+            const activeEl = document.activeElement;
+            if (!activeEl || activeEl.id !== 'royalMessageInput') {
+              renderMainView();
+            } else {
+              // Si está escribiendo, actualizar solo las listas de deseos sin tocar el textarea
+              renderListsOnly(currentRoute);
+            }
+          },
+          (error) => {
+            console.error('Error en sincronización en tiempo real:', error);
+            updateSyncBanner('demo', 'No se pudo conectar con la base de datos. Revisa las reglas de seguridad o tu configuración.');
+          }
+        );
+      } catch (err) {
+        console.error('Error inicializando la nube:', err);
+        updateSyncBanner('demo', 'Modo sin conexión: verifica los datos de configuración en index.html.');
+      }
+    }
+
+    async function persistMemberData(personId) {
+      if (!db || !currentUser) return;
+      try {
+        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'cartas_reyes_familia', personId);
+        await setDoc(docRef, {
+          message: appData[personId].message,
+          wishes: appData[personId].wishes,
+          updatedAt: Date.now()
+        }, { merge: true });
+      } catch (err) {
+        console.error('Error guardando datos en la nube:', err);
+        showToast('Error al guardar en la nube', '⚠️');
+      }
+    }
+
+    // =========================================================================
+    // 4. UTILIDADES Y NOTIFICACIONES
+    // =========================================================================
+    let toastTimeout = null;
+    function showToast(text, icon = '✨') {
+      const banner = document.getElementById('toastBanner');
+      const content = document.getElementById('toastContent');
+      content.innerHTML = `<span class="text-base">${icon}</span><span>${escapeHtml(text)}</span>`;
+      banner.classList.remove('opacity-0', 'translate-y-[-10px]');
+      banner.classList.add('opacity-100', 'translate-y-0');
+
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        banner.classList.remove('opacity-100', 'translate-y-0');
+        banner.classList.add('opacity-0', 'translate-y-[-10px]');
+      }, 2600);
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function normalizeUrl(url) {
+      const trimmed = url.trim();
+      if (!trimmed) return '';
+      if (/^https?:\/\//i.test(trimmed)) return trimmed;
+      return 'https://' + trimmed;
+    }
+
+    window.toggleSetupModal = function(show) {
+      const modal = document.getElementById('setupModal');
+      if (show) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      } else {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    };
+
+    // =========================================================================
+    // 5. NAVEGACIÓN Y RENDERIZADO DE INTERFAZ
+    // =========================================================================
+    function navigateTo(route) {
+      currentRoute = route;
+      renderBottomNav();
+      renderMainView();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function renderBottomNav() {
+      const homeBtn = document.getElementById('nav-home');
+      const container = document.getElementById('bottomPeopleButtons');
+
+      if (currentRoute === 'home') {
+        homeBtn.className = 'flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold shrink-0 bg-amber-400 text-night-950 shadow-md cursor-pointer';
+      } else {
+        homeBtn.className = 'flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold shrink-0 bg-night-800/80 text-amber-100 hover:bg-night-700 border border-amber-400/20 cursor-pointer';
+      }
+
+      container.innerHTML = FAMILY_MEMBERS.map(person => {
+        const isActive = currentRoute === person.id;
+        const pendingCount = appData[person.id].wishes.filter(w => !w.completed).length;
+        return `
+          <button
+            type="button"
+            onclick="window.appActions.navigateTo('${person.id}')"
+            class="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold shrink-0 transition-all cursor-pointer ${
+              isActive
+                ? 'bg-gradient-to-r from-amber-400 to-amber-300 text-night-950 font-bold shadow-md scale-[1.02]'
+                : 'bg-night-800/70 text-slate-200 hover:bg-night-700 border border-white/10'
+            }"
+          >
+            <span>${person.emoji}</span>
+            <span>${person.name}</span>
+            ${pendingCount > 0 ? `<span class="ml-0.5 px-1.5 py-0.2 rounded-full text-[10px] ${isActive ? 'bg-night-950/20 text-night-950' : 'bg-amber-400/20 text-amber-300'}">${pendingCount}</span>` : ''}
+          </button>
+        `;
+      }).join('');
+    }
+
+    function renderMainView() {
+      const main = document.getElementById('mainView');
+      if (currentRoute === 'home') {
+        renderHomeView(main);
+      } else {
+        renderPersonCardView(main, currentRoute);
+      }
+    }
+
+    // VISTA MENÚ PRINCIPAL
+    function renderHomeView(container) {
+      const cardsHtml = FAMILY_MEMBERS.map(person => {
+        const personData = appData[person.id];
+        const totalWishes = personData.wishes.length;
+        const doneWishes = personData.wishes.filter(w => w.completed).length;
+        const pendingWishes = totalWishes - doneWishes;
+        const hasMessage = personData.message.trim().length > 0;
+
+        return `
+          <div
+            onclick="window.appActions.navigateTo('${person.id}')"
+            class="group relative bg-parchment-100 hover:bg-parchment-50 rounded-3xl p-5 border-2 border-amber-300/80 hover:border-amber-500 shadow-lg hover:shadow-2xl transition-all duration-200 cursor-pointer flex flex-col justify-between overflow-hidden"
+          >
+            <div class="absolute top-0 inset-x-0 h-2 bg-gradient-to-r ${person.accent}"></div>
+
+            <div>
+              <div class="flex items-center justify-between gap-3 mb-3 pt-1">
+                <div class="flex items-center gap-3">
+                  <div class="w-12 h-12 rounded-2xl bg-gradient-to-br ${person.accent} text-white flex items-center justify-center text-2xl shadow-md group-hover:scale-105 transition-transform">
+                    ${person.emoji}
+                  </div>
+                  <div>
+                    <h3 class="font-serif text-xl font-bold text-night-900 group-hover:text-crimson-700 transition-colors">
+                      Carta de ${person.name}
+                    </h3>
+                    <p class="text-xs font-medium ${hasMessage ? 'text-emerald-700' : 'text-crimson-700'}">
+                      ${hasMessage ? '✅ Frase a los Reyes escrita' : '⚠️ Falta escribir su frase'}
+                    </p>
+                  </div>
+                </div>
+                <span class="text-amber-600 group-hover:translate-x-1 transition-transform text-xl font-bold">→</span>
+              </div>
+
+              <div class="mt-4 pt-3 border-t border-amber-200/80 flex items-center justify-between text-xs sm:text-sm">
+                <span class="font-semibold text-slate-700">
+                  🎁 ${pendingWishes} ${pendingWishes === 1 ? 'deseo pendiente' : 'deseos pendientes'}
+                </span>
+                ${doneWishes > 0 ? `
+                  <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-semibold text-xs">
+                    ✓ ${doneWishes} ${doneWishes === 1 ? 'tachado' : 'tachados'}
+                  </span>
+                ` : `
+                  <span class="text-slate-400 italic text-xs">Abrir carta</span>
+                `}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      container.innerHTML = `
+        <section class="space-y-6">
+          <div class="bg-parchment-100/95 backdrop-blur-xs rounded-3xl p-5 sm:p-7 border-2 border-amber-400/60 shadow-xl text-center">
+            <h2 class="font-serif text-2xl sm:text-3xl font-bold text-night-900 mb-2">
+              ✨ Cartas de la Familia ✨
+            </h2>
+            <p class="text-slate-600 text-sm sm:text-base max-w-xl mx-auto">
+              Selecciona una carta para escribir la frase obligatoria a Sus Majestades, apuntar regalos con enlace o tachar los deseos ya listos.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+            ${cardsHtml}
+          </div>
+        </section>
+      `;
+    }
+
+    // VISTA CARTA INDIVIDUAL
+    function renderPersonCardView(container, personId) {
+      const person = FAMILY_MEMBERS.find(p => p.id === personId) || FAMILY_MEMBERS[0];
+      const data = appData[person.id];
+      const isMessageEmpty = data.message.trim().length === 0;
+
+      container.innerHTML = `
+        <article class="bg-parchment-100 rounded-3xl border-2 border-amber-400/80 shadow-2xl overflow-hidden">
+          <div class="h-3 bg-gradient-to-r ${person.accent}"></div>
+
+          <div class="p-5 sm:p-8 space-y-7">
+            <!-- Cabecera de la carta -->
+            <div class="flex flex-wrap items-center justify-between gap-3 border-b-2 border-amber-300/70 pb-4">
+              <div class="flex items-center gap-3.5">
+                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br ${person.accent} text-white flex items-center justify-center text-3xl shadow-md">
+                  ${person.emoji}
+                </div>
+                <div>
+                  <span class="text-xs font-bold uppercase tracking-wider text-crimson-700">★ Carta Oficial de Oriente ★</span>
+                  <h2 class="font-serif text-2xl sm:text-3xl font-bold text-night-900">
+                    Carta de ${person.name}
+                  </h2>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onclick="window.appActions.navigateTo('home')"
+                class="px-3.5 py-2 rounded-xl bg-amber-200/70 hover:bg-amber-300/80 text-amber-950 text-xs sm:text-sm font-semibold transition-colors cursor-pointer"
+              >
+                ← Todas las cartas
+              </button>
+            </div>
+
+            <!-- RECUADRO OBLIGATORIO DE FRASE PARA LOS REYES -->
+            <section id="messageBoxSection" class="rounded-2xl p-4 sm:p-5 transition-colors border-2 ${
+              isMessageEmpty
+                ? 'bg-red-50/90 border-crimson-600/70 shadow-xs'
+                : 'bg-white/90 border-amber-400'
+            }">
+              <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                <label for="royalMessageInput" class="font-serif font-bold text-base sm:text-lg text-crimson-800 flex items-center gap-2">
+                  <span>📜</span>
+                  <span>Queridos Reyes Magos, este año quiero deciros que...</span>
+                </label>
+                <span id="messageStatusBadge" class="px-2.5 py-0.5 rounded-full text-xs font-bold ${
+                  isMessageEmpty
+                    ? 'bg-crimson-700 text-white animate-pulse'
+                    : 'bg-emerald-100 text-emerald-800'
+                }">
+                  ${isMessageEmpty ? '⚠️ Obligatorio' : '✓ Frase completada'}
+                </span>
+              </div>
+
+              <p id="messageHelperText" class="text-xs sm:text-sm text-crimson-700/90 italic mb-3">
+                ${isMessageEmpty
+                  ? '¡Atención! Hay que rellenar esta frase con un mensaje bonito; si no, ¡los Reyes Magos pasarán de largo y no vendrán!'
+                  : '¡Genial! Los Reyes Magos leerán este mensaje con mucha ilusión.'}
+              </p>
+
+              <textarea
+                id="royalMessageInput"
+                rows="3"
+                placeholder="Escribe aquí por qué te mereces que vengan los Reyes Magos o un mensaje especial para ellos..."
+                oninput="window.appActions.updateMessage('${person.id}', this.value)"
+                class="w-full rounded-xl border border-amber-300 bg-parchment-50 px-3.5 py-2.5 text-sm sm:text-base text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all"
+              >${escapeHtml(data.message)}</textarea>
+            </section>
+
+            <!-- FORMULARIO PARA AÑADIR NUEVOS DESEOS -->
+            <section class="bg-white/85 rounded-2xl p-4 sm:p-5 border border-amber-300 shadow-xs">
+              <h3 class="font-serif text-lg font-bold text-night-900 mb-3 flex items-center gap-2">
+                <span>🎁</span>
+                <span>Añadir un deseo a la lista</span>
+              </h3>
+
+              <form onsubmit="window.appActions.handleAddWish(event, '${person.id}')" class="space-y-3">
+                <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
+                  <div class="sm:col-span-7">
+                    <label for="wishTitleInput" class="block text-xs font-semibold text-slate-600 mb-1">
+                      ¿Qué regalo o deseo quieres pedir? *
+                    </label>
+                    <input
+                      id="wishTitleInput"
+                      type="text"
+                      required
+                      placeholder="Ej. Juego de mesa, bicicleta, libro..."
+                      class="w-full rounded-xl border border-amber-300 bg-parchment-50 px-3.5 py-2.5 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    />
+                  </div>
+
+                  <div class="sm:col-span-5">
+                    <label for="wishUrlInput" class="block text-xs font-semibold text-slate-600 mb-1">
+                      Enlace para los Reyes (opcional)
+                    </label>
+                    <input
+                      id="wishUrlInput"
+                      type="text"
+                      placeholder="https://tienda.com/regalo"
+                      class="w-full rounded-xl border border-amber-300 bg-parchment-50 px-3.5 py-2.5 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    />
+                  </div>
+                </div>
+
+                <div class="flex justify-end">
+                  <button
+                    type="submit"
+                    class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-crimson-700 to-crimson-600 hover:from-crimson-800 hover:to-crimson-700 text-white font-semibold text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <span>✨</span>
+                    <span>Añadir a mi carta</span>
+                  </button>
+                </div>
+              </form>
+            </section>
+
+            <!-- CONTENEDOR DE LISTAS (PENDIENTES Y TACHADOS) -->
+            <div id="wishListsContainer" class="space-y-7"></div>
+          </div>
+        </article>
+      `;
+
+      renderListsOnly(person.id);
+    }
+
+    function renderListsOnly(personId) {
+      const container = document.getElementById('wishListsContainer');
+      if (!container) return;
+
+      const person = FAMILY_MEMBERS.find(p => p.id === personId) || FAMILY_MEMBERS[0];
+      const data = appData[person.id];
+      const activeWishes = data.wishes.filter(w => !w.completed);
+      const completedWishes = data.wishes.filter(w => w.completed);
+
+      container.innerHTML = `
+        <!-- LISTA ACTIVA DE DESEOS (PENDIENTES) -->
+        <section class="space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="font-serif text-lg sm:text-xl font-bold text-night-900 flex items-center gap-2">
+              <span>🌟</span>
+              <span>Lista de deseos de ${person.name}</span>
+              <span class="ml-1 px-2.5 py-0.5 rounded-full bg-amber-200 text-amber-950 text-xs font-bold">
+                ${activeWishes.length}
+              </span>
+            </h3>
+          </div>
+
+          ${activeWishes.length === 0 ? `
+            <div class="rounded-2xl border-2 border-dashed border-amber-300/80 bg-white/50 p-6 text-center text-slate-500 text-sm">
+              Aún no hay deseos pendientes en esta carta. ¡Añade el primero arriba! 🎄
+            </div>
+          ` : `
+            <ul class="space-y-2.5">
+              ${activeWishes.map(wish => renderWishItem(person.id, wish, false)).join('')}
+            </ul>
+          `}
+        </section>
+
+        <!-- SECCIÓN INFERIOR: DESEOS YA CONSEGUIDOS / TACHADOS -->
+        <section class="pt-4 border-t-2 border-amber-300/70 space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="font-serif text-base sm:text-lg font-bold text-slate-600 flex items-center gap-2">
+              <span>✅</span>
+              <span>Deseos ya conseguidos / Tachados</span>
+              <span class="ml-1 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold">
+                ${completedWishes.length}
+              </span>
+            </h3>
+          </div>
+
+          ${completedWishes.length === 0 ? `
+            <p class="text-xs sm:text-sm text-slate-400 italic">
+              Cuando pulses la bolita redonda a la izquierda de un deseo, aparecerá aquí abajo tachado y con su círculo relleno.
+            </p>
+          ` : `
+            <ul class="space-y-2">
+              ${completedWishes.map(wish => renderWishItem(person.id, wish, true)).join('')}
+            </ul>
+          `}
+        </section>
+      `;
+    }
+
+    function renderWishItem(personId, wish, isCompleted) {
+      const safeTitle = escapeHtml(wish.title);
+      const safeUrl = wish.url ? escapeHtml(wish.url) : '';
+
+      return `
+        <li class="group flex items-center justify-between gap-3 p-3.5 rounded-2xl border transition-all ${
+          isCompleted
+            ? 'bg-slate-100/85 border-slate-200/90 opacity-85'
+            : 'bg-white border-amber-200 hover:border-amber-400 shadow-xs'
+        }">
+          <div class="flex items-center gap-3.5 min-w-0 flex-1">
+            <!-- BOLITA REDONDA IZQUIERDA (26px) -->
+            <button
+              type="button"
+              onclick="window.appActions.toggleWish('${personId}', '${wish.id}')"
+              aria-label="${isCompleted ? 'Desmarcar deseo' : 'Marcar deseo como tachado'}"
+              title="${isCompleted ? 'Volver a poner como pendiente' : 'Tachar deseo'}"
+              class="w-[26px] h-[26px] rounded-full flex items-center justify-center shrink-0 transition-all cursor-pointer ${
+                isCompleted
+                  ? 'bg-gradient-to-br from-emerald-500 to-emerald-700 border-2 border-emerald-600 text-white shadow-xs scale-105'
+                  : 'bg-parchment-50 border-2 border-amber-500 hover:border-crimson-600 hover:bg-amber-100/60'
+              }"
+            >
+              ${isCompleted ? `
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              ` : ''}
+            </button>
+
+            <div class="min-w-0 flex-1 flex flex-wrap items-center gap-2">
+              <span class="text-sm sm:text-base font-medium break-words ${
+                isCompleted ? 'line-through text-slate-400' : 'text-slate-800'
+              }">
+                ${safeTitle}
+              </span>
+
+              ${safeUrl ? `
+                <a
+                  href="${safeUrl}"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onclick="event.stopPropagation()"
+                  class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold transition-colors shrink-0 ${
+                    isCompleted
+                      ? 'bg-slate-200 text-slate-500 hover:bg-slate-300'
+                      : 'bg-amber-100 text-amber-900 hover:bg-amber-200 border border-amber-300'
+                  }"
+                >
+                  <span>🔗</span>
+                  <span>Ver enlace</span>
+                </a>
+              ` : ''}
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onclick="window.appActions.deleteWish('${personId}', '${wish.id}')"
+            title="Eliminar deseo"
+            aria-label="Eliminar deseo"
+            class="p-2 rounded-xl text-slate-400 hover:text-crimson-700 hover:bg-red-50 transition-colors shrink-0 cursor-pointer"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+          </button>
+        </li>
+      `;
+    }
+
+    // =========================================================================
+    // 6. ACCIONES DE USUARIO EXPUESTAS AL DOM
+    // =========================================================================
+    window.appActions = {
+      navigateTo,
+
+      updateMessage(personId, value) {
+        appData[personId].message = value;
+
+        const isEmpty = value.trim().length === 0;
+        const section = document.getElementById('messageBoxSection');
+        const badge = document.getElementById('messageStatusBadge');
+        const helper = document.getElementById('messageHelperText');
+
+        if (section && badge && helper) {
+          if (isEmpty) {
+            section.classList.remove('bg-white/90', 'border-amber-400');
+            section.classList.add('bg-red-50/90', 'border-crimson-600/70');
+            badge.className = 'px-2.5 py-0.5 rounded-full text-xs font-bold bg-crimson-700 text-white animate-pulse';
+            badge.textContent = '⚠️ Obligatorio';
+            helper.textContent = '¡Atención! Hay que rellenar esta frase con un mensaje bonito; si no, ¡los Reyes Magos pasarán de largo y no vendrán!';
+          } else {
+            section.classList.remove('bg-red-50/90', 'border-crimson-600/70');
+            section.classList.add('bg-white/90', 'border-amber-400');
+            badge.className = 'px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800';
+            badge.textContent = '✓ Frase completada';
+            helper.textContent = '¡Genial! Los Reyes Magos leerán este mensaje con mucha ilusión.';
+          }
+        }
+
+        clearTimeout(messageDebounceTimer);
+        messageDebounceTimer = setTimeout(() => {
+          persistMemberData(personId);
+        }, 500);
+      },
+
+      async handleAddWish(event, personId) {
+        event.preventDefault();
+        const titleInput = document.getElementById('wishTitleInput');
+        const urlInput = document.getElementById('wishUrlInput');
+
+        const title = titleInput.value.trim();
+        const rawUrl = urlInput.value.trim();
+        if (!title) return;
+
+        const newWish = {
+          id: 'w_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+          title: title,
+          url: rawUrl ? normalizeUrl(rawUrl) : '',
+          completed: false
+        };
+
+        appData[personId].wishes.unshift(newWish);
+        titleInput.value = '';
+        urlInput.value = '';
+
+        renderBottomNav();
+        renderListsOnly(personId);
+        showToast('Deseo añadido a la carta', '🎁');
+        await persistMemberData(personId);
+      },
+
+      async toggleWish(personId, wishId) {
+        const wishes = appData[personId].wishes;
+        const target = wishes.find(w => w.id === wishId);
+        if (!target) return;
+
+        target.completed = !target.completed;
+        renderBottomNav();
+        renderListsOnly(personId);
+
+        if (target.completed) {
+          showToast('Deseo tachado y movido abajo', '✅');
+        } else {
+          showToast('Deseo devuelto a la lista activa', '✨');
+        }
+
+        await persistMemberData(personId);
+      },
+
+      async deleteWish(personId, wishId) {
+        appData[personId].wishes = appData[personId].wishes.filter(w => w.id !== wishId);
+        renderBottomNav();
+        renderListsOnly(personId);
+        showToast('Deseo eliminado de la lista', '🗑️');
+        await persistMemberData(personId);
+      }
+    };
+
+    // =========================================================================
+    // 7. ANIMACIÓN DE COPOS DE NIEVE EN LA CABECERA
+    // =========================================================================
+    function initSnowAnimation() {
+      const canvas = document.getElementById('snowCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let flakes = [];
+
+      function resizeCanvas() {
+        const rect = canvas.parentElement.getBoundingClientRect();
+        canvas.width = rect.width;
+        canvas.height = rect.height;
+      }
+
+      function createFlakes() {
+        const count = Math.min(55, Math.floor(canvas.width / 16));
+        flakes = Array.from({ length: count }, () => ({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          r: Math.random() * 2.4 + 1,
+          speedY: Math.random() * 0.75 + 0.35,
+          speedX: (Math.random() - 0.5) * 0.4,
+          opacity: Math.random() * 0.65 + 0.25
+        }));
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (const f of flakes) {
+          ctx.beginPath();
+          ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(255, 255, 255, ${f.opacity})`;
+          ctx.fill();
+
+          f.y += f.speedY;
+          f.x += f.speedX;
+
+          if (f.y > canvas.height) {
+            f.y = -5;
+            f.x = Math.random() * canvas.width;
+          }
+          if (f.x > canvas.width) f.x = 0;
+          if (f.x < 0) f.x = canvas.width;
+        }
+        requestAnimationFrame(draw);
+      }
+
+      resizeCanvas();
+      createFlakes();
+      draw();
+
+      window.addEventListener('resize', () => {
+        resizeCanvas();
+        createFlakes();
+      });
+    }
+
+    window.addEventListener('load', () => {
+      initSnowAnimation();
+      renderBottomNav();
+      renderMainView();
+      initCloudSync();
+    });
+  </script>
+</body>
+</html>
